@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>BuzzCall!</title>
+    <!-- Important to load artyom in the head tag, this give time to load all the voices in the browser -->
+
+    <script type="text/javascript" src="artyom.window.min.js"></script>
+    <script type='text/javascript' src='obs-websocket.js'></script>
+</head>
+
+<body>
+
+
+<div>
+<button type="button" onclick="StartArtyomContinuous();">Start Recognition</button> <br>
+<button type="button" onclick="StopArtyom();">Stop Recognition</button>
+</div>
+
+<span id='output'></span>
+
+
+<script>
+const obs = new OBSWebSocket();
+const artyom = new Artyom();
+
+function StartArtyomContinuous(){
+    console.log("Continuous commands");
+    if(artyom.isRecognizing()){
+        return alert("Stop artyom first !");
+    }
+
+    // You can create a permanent voice assistant
+    // if you want using the continuous mode !
+    return artyom.initialize({
+        lang:"en-US",
+        debug:false,
+        continuous:true,
+        listen:true
+    });
+}
+
+function StopArtyom(){
+    artyom.fatality();
+}
+
+obs.connect({
+        address: 'localhost:4444',
+    })
+    .then(() => {
+        console.log(`Success! We're connected & authenticated.`);
+ 
+        return obs.send('GetSceneList');
+    })
+
+artyom.addCommands([
+                {
+                    //Query for Artyom to listen for
+                    indexes: ['Adnan are you there','are you there', 'are you connected', 'can you hear me' ,'are you still there'],
+                    
+                    // WHat scene should it play
+                    action: (i) => {
+                        console.log(`Playing Offline`);
+                        obs.send('SetCurrentScene', {
+                        'scene-name': 'Offline'
+                    });
+
+                    // How long before it goes back to the background
+                    setTimeout(() => {
+                        obs.send('SetCurrentScene', {
+                        'scene-name': 'Background'
+                    });
+                    }, 8000)
+                    }
+                },
+                {
+                    //Query for Artyom to listen for
+                    indexes: ['what do you think','do you agree', 'you agree'],
+                    
+                    // WHat scene should it play
+                    action: (i) => {
+                        console.log(`Playing Slack me later`);
+                        obs.send('SetCurrentScene', {
+                            'scene-name': 'Slackmeafter'
+                        });
+
+                        // How long before it goes back to the background
+                        setTimeout(() => {
+                        obs.send('SetCurrentScene', {
+                        'scene-name': 'Background'
+                    });
+                    }, 8000)
+                    }
+                }
+            ]);
+ 
+// You must add this handler to avoid uncaught exceptions.
+obs.on('error', err => {
+    console.error('socket error:', err);
+});
+
+</script>
+
+</body>
+</html>
