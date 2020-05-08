@@ -96,8 +96,12 @@ In index.html under the Artyom add commands function is where the speech recogni
     - Sometimes if OBS doesn't show up as a camera source you might have to restart Chrome
 4. Call someone on Hangouts or Chrome
 5. Turn your Volume Up
-6. Click Start Recognition
-7. Go Play Animal Crossing
+6. Start the program with
+    ```
+    node app.js
+    ```
+7. Click Start Recognition
+8. Go Play Animal Crossing
 
 ![Chat Image](/images/chat.jpeg)
 
